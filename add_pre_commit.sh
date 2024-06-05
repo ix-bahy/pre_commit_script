@@ -76,7 +76,6 @@ if $new; then
   if  [[ -z "$name" ]]; then
       echo "Error: --name is required."
       usage
-      exit 1
   fi
 fi
 
