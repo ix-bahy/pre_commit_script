@@ -1,5 +1,5 @@
 usage() {
-    echo "Usage: $0 --name <name> [--new] "
+    echo "Usage: $0 [--new] --name <project_name>"
     exit 1
 }
 new=false
@@ -76,6 +76,7 @@ if $new; then
   if  [[ -z "$name" ]]; then
       echo "Error: --name is required."
       usage
+      exit 1
   fi
 fi
 
