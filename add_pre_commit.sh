@@ -26,6 +26,17 @@ case $1 in
 done
 
 yaml="repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.6.8
+    hooks:
+
+      - id: ruff
+        types_or: [ python, pyi ]
+        args: [ --fix ]
+
+      - id: ruff-format
+        types_or: [ python, pyi ]
+
   - repo: https://github.com/PyCQA/pylint
     rev: v3.1.0
     hooks:
@@ -51,10 +62,11 @@ yaml="repos:
     hooks:
       - id: bandit
 
-  - repo: https://github.com/psf/black
-    rev: 24.2.0
+  - repo: https://github.com/RobertCraigie/pyright-python
+    rev: v1.1.383
     hooks:
-      - id: black
+    - id: pyright
+
   - repo: https://github.com/PyCQA/flake8
     rev: 7.0.0
     hooks:
@@ -71,6 +83,7 @@ yaml="repos:
     hooks:
       - id: osv-scanner
         args: ["-r", "."]"
+
 
 if $new; then
   if  [[ -z "$name" ]]; then
@@ -91,3 +104,4 @@ touch .pre-commit-config.yaml
 echo "$yaml" > .pre-commit-config.yaml
 poetry add pyproject-pre-commit -G dev
 poetry run pre-commit install
+touch .pylintrc
