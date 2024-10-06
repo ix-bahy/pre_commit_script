@@ -6,6 +6,8 @@ this is a simple bash script to add pre commit hooks to your exsiting python pro
 
 - git
 - poetry "python dependancy mangment tool"
+- pre-commit "pip install pre-commit"
+
 
 ## in an already existing project
 
