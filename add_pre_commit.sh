@@ -62,11 +62,6 @@ yaml="repos:
     hooks:
       - id: bandit
 
-  - repo: https://github.com/RobertCraigie/pyright-python
-    rev: v1.1.383
-    hooks:
-    - id: pyright
-
   - repo: https://github.com/PyCQA/flake8
     rev: 7.0.0
     hooks:
@@ -84,6 +79,11 @@ yaml="repos:
       - id: osv-scanner
         args: ["-r", "."]"
 
+
+  # - repo: https://github.com/RobertCraigie/pyright-python
+  #   rev: v1.1.383
+  #   hooks:
+  #   - id: pyright
 
 if $new; then
   if  [[ -z "$name" ]]; then
