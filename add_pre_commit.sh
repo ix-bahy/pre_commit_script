@@ -1,12 +1,20 @@
+#!/bin/bash
+
 usage() {
-    echo "Usage: $0 [--new] --name <project_name>"
+    echo "Usage: $0 [--new] --name <project_name> [-m|--manager <poetry|rye>]"
+    echo "  --new: Create a new project"
+    echo "  --name: Name of the project"
+    echo "  -m|--manager: Package manager (poetry or rye, default: poetry)"
     exit 1
 }
+
 new=false
 name=""
+manager="poetry"  # Default value
 
+# Parse arguments
 while [[ "$#" -gt 0 ]]; do
-case $1 in
+    case $1 in
         --name)
             name="$2"
             shift 2
@@ -14,6 +22,15 @@ case $1 in
         --new)
             new=true
             shift
+            ;;
+        --manager|-m)
+            if [[ "$2" == "poetry" || "$2" == "rye" ]]; then
+                manager="$2"
+                shift 2
+            else
+                echo "Error: Manager must be either 'poetry' or 'rye'"
+                usage
+            fi
             ;;
         --help)
             usage
@@ -25,6 +42,7 @@ case $1 in
     esac
 done
 
+# YAML content for .pre-commit-config.yaml (unchanged)
 yaml="repos:
   # Ruff: A fast linter and formatter (replaces flake8, isort, and others)
   - repo: https://github.com/astral-sh/ruff-pre-commit
@@ -76,24 +94,39 @@ yaml="repos:
     hooks:
       - id: python-use-type-annotations  # Enforce type annotations in Python code"
 
-
+# Check if --new is set and --name is provided
 if $new; then
-  if  [[ -z "$name" ]]; then
-      echo "Error: --name is required."
-      usage
-  fi
+    if [[ -z "$name" ]]; then
+        echo "Error: --name is required."
+        usage
+    fi
 fi
 
+# Create project and set up based on manager
 if $new; then
-  poetry new $name
-  cd $name
-  git init
-  git branch -M main
-  poetry install
-fi
+    if [[ "$manager" == "poetry" ]]; then
+        poetry new "$name"
+        cd "$name" || exit 1
+        git init
+        git branch -M main
+        poetry install
+        poetry add pyproject-pre-commit -G dev
+    elif [[ "$manager" == "rye" ]]; then
+        rye init "$name"
+        cd "$name" || exit 1
+        git init
+        git branch -M main
+        rye sync  # Equivalent to poetry install
+        rye add pyproject-pre-commit -G dev
+    fi
 
-touch .pre-commit-config.yaml
-echo "$yaml" > .pre-commit-config.yaml
-poetry add pyproject-pre-commit -G dev
-poetry run pre-commit install
-touch .pylintrc
+    # Common steps after project creation
+    touch .pre-commit-config.yaml
+    echo "$yaml" > .pre-commit-config.yaml
+    if [[ "$manager" == "poetry" ]]; then
+        poetry run pre-commit install
+    else
+        rye run pre-commit install  # Rye uses "run" for executing commands
+    fi
+    touch .pylintrc
+fi
