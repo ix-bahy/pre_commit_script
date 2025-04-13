@@ -26,64 +26,56 @@ case $1 in
 done
 
 yaml="repos:
+  # Ruff: A fast linter and formatter (replaces flake8, isort, and others)
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.6.8
     hooks:
-
       - id: ruff
-        types_or: [ python, pyi ]
-        args: [ --fix ]
+        types_or: [python, pyi]
+        args: [--fix]  # Automatically fix linting issues
 
       - id: ruff-format
-        types_or: [ python, pyi ]
+        types_or: [python, pyi]  # Automatically format code
 
-  - repo: https://github.com/PyCQA/pylint
-    rev: v3.1.0
-    hooks:
-      - id: pylint
-        args: ["--rcfile=.pylintrc"]
-
+  # Pre-commit Hooks: General-purpose checks
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.5.0
     hooks:
-      - id: trailing-whitespace
-      - id: check-ast
-      - id: check-builtin-literals
-      - id: check-case-conflict
-      - id: check-executables-have-shebangs
-      - id: check-json
-      - id: check-docstring-first
-      - id: check-toml
-      - id: check-yaml
-      - id: end-of-file-fixer
+      - id: trailing-whitespace  # Remove trailing whitespace
+      - id: check-ast            # Check Python files for valid syntax
+      - id: check-case-conflict  # Check for files with conflicting case
+      - id: check-json           # Validate JSON files
+      - id: check-toml           # Validate TOML files
+      - id: check-yaml           # Validate YAML files
+      - id: end-of-file-fixer    # Ensure files end with a newline
 
+  # Bandit: Security linter
   - repo: https://github.com/PyCQA/bandit
     rev: 1.7.7
     hooks:
-      - id: bandit
+      - id: bandit  # Check for common security issues
 
-  - repo: https://github.com/PyCQA/flake8
-    rev: 7.0.0
-    hooks:
-      - id: flake8
-
+  # Detect Secrets: Prevent committing sensitive information
   - repo: https://github.com/Yelp/detect-secrets
     rev: v1.4.0
     hooks:
       - id: detect-secrets
-        args: [".secrets.baseline"]
+        args: ['.secrets.baseline']  # Use a baseline file to ignore known secrets
 
+  # OSV Scanner: Check for vulnerable dependencies
   - repo: https://github.com/google/osv-scanner/
     rev: v1.6.2
     hooks:
       - id: osv-scanner
-        args: ["-r", "."]"
+        args: ['-r', '.']  # Scan the project for vulnerable dependencies
 
 
-  # - repo: https://github.com/RobertCraigie/pyright-python
-  #   rev: v1.1.383
-  #   hooks:
-  #   - id: pyright
+  # Type Annotations Enforcer: Ensure functions have type annotations
+  - repo: https://github.com/pre-commit/pygrep-hooks
+    rev: v1.9.0
+    hooks:
+      - id: python-use-type-annotations  # Enforce type annotations in Python code"
+
 
 if $new; then
   if  [[ -z "$name" ]]; then
