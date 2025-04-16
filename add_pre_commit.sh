@@ -1,5 +1,4 @@
 #!/bin/bash
-
 usage() {
     echo "Usage: $0 [--new] --name <project_name> [-m|--manager <poetry|rye>]"
     echo "  --new: Create a new project"
@@ -100,6 +99,29 @@ if $new; then
         echo "Error: --name is required."
         usage
     fi
+fi
+
+# Setup for existing project (when new is false)
+if ! $new; then
+    echo "Setting up pre-commit in the current directory..."
+
+    # Create .pre-commit-config.yaml with the YAML content
+    touch .pre-commit-config.yaml
+    echo "$yaml" > .pre-commit-config.yaml
+
+    # Set up pre-commit based on the package manager
+    if [[ "$manager" == "poetry" ]]; then
+        poetry add pyproject-pre-commit -G dev
+        poetry run pre-commit install
+    else
+        rye add pyproject-pre-commit -G dev
+        rye run pre-commit install
+    fi
+
+    # Create .pylintrc file
+    touch .pylintrc
+    echo "Pre-commit setup complete for current project!"
+    exit 0
 fi
 
 # Create project and set up based on manager
